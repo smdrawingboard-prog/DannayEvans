@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import Sidebar from './components/layout/Sidebar.jsx'
 import Overview from './components/overview/Overview.jsx'
 import RecruitmentPipeline from './components/recruitment/RecruitmentPipeline.jsx'
@@ -36,6 +37,7 @@ export default function App() {
       <main className="main-content">
         <SectionComponent />
       </main>
+      <Analytics />
     </div>
   )
 }
