@@ -22,3 +22,4 @@ for f in "$ROOT"/supabase/migrations/*.sql; do
   run "$f"
 done
 run "$ROOT/supabase/tests/isolation_test.sql"
+run "$ROOT/supabase/tests/pricing_test.sql"

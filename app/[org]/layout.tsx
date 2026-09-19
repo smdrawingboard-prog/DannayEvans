@@ -12,6 +12,7 @@ const NAV = [
   { href: '/deals', label: 'Business development' },
   { href: '/careers', label: 'Careers site' },
   { href: '/automations', label: 'Automations' },
+  { href: '/settings/billing', label: 'Plan and usage' },
   { href: '/settings', label: 'Settings' },
 ]
 

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { requireOrg } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { getSignatureProvider, SignatureError } from '@/lib/signatures'
+import { checkEntitlement, entitlementMessage } from '@/lib/billing'
 
 export interface ActionResult {
   error?: string
@@ -33,10 +34,24 @@ export async function sendEnvelope(
   envelopeId: string,
 ): Promise<ActionResult> {
   try {
-    const { envelope } = await authorise(orgSlug, envelopeId)
+    const { ctx, envelope } = await authorise(orgSlug, envelopeId)
+
+    // Sending is the billable moment, so the entitlement check belongs here
+    // and nowhere else in the UI. The meter itself is a database trigger, so
+    // usage is recorded whether the send came from here, an automation or
+    // the API — this check only decides whether the send is permitted.
+    const entitlement = await checkEntitlement(ctx.orgId)
+    if (!entitlement.allowed) {
+      return { error: entitlementMessage(entitlement) ?? 'Sending is not available on your plan right now.' }
+    }
+
     await getSignatureProvider(envelope.provider).send(envelopeId)
     revalidatePath(`/${orgSlug}/envelopes/${envelopeId}`)
-    return { notice: 'Sent.' }
+
+    // An allowed send can still be worth flagging: the customer should learn
+    // they have moved into overage from the app, not from the invoice.
+    const warning = entitlementMessage(entitlement)
+    return { notice: warning ? `Sent. ${warning}` : 'Sent.' }
   } catch (e) {
     return { error: e instanceof SignatureError ? e.message : 'Could not send this document.' }
   }

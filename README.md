@@ -49,9 +49,15 @@ npm run db:test
 
 This spins the migrations up on a scratch Postgres and asserts the things that
 would be expensive to get wrong: that one tenant cannot read or write another
-tenant's rows, that an envelope only completes when the last signer signs, and
-that audit events cannot be edited or deleted. Nineteen assertions, all of
-which must pass before a release.
+tenant's rows, that an envelope only completes when the last signer signs,
+that audit events cannot be edited or deleted, and that every boundary of the
+graduated pricing bands prices correctly. Fifty-three assertions, all of which
+must pass before a release.
+
+Pricing maths is asserted at every band edge — the first unit of a band, the
+last unit, and the unit either side of each threshold — because band
+arithmetic is exactly the kind of code that is subtly wrong and silently
+mis-bills for months.
 
 You need a local Postgres 16 listening on `/tmp:5433`, or set `PGHOST`/`PGPORT`.
 
@@ -153,6 +159,96 @@ recomputing it detects any later tampering.
 
 ---
 
+## Pricing and metering
+
+The commercial model, decided deliberately and encoded in migrations `008`
+and `009`:
+
+**Billable unit: one envelope sent.** Not per signature, not per page. An
+offer letter going to a candidate *and* a hiring manager is one charge.
+Charging per signer would punish exactly the multi-party deals you want
+running through the platform.
+
+**Charged on sending, not on signing.** That is when the work happens — the
+documents are stored, links minted, audit trail opened, delivery attempted.
+Billing on completion would mean a customer with a poor signing rate is
+subsidised by one with a good rate.
+
+**Shape: base fee + included allowance + per-envelope overage.** Predictable
+MRR, and heavy users still pay for what they use.
+
+| Tier | Segment | ZAR / month | Included | Overage | Seats |
+|---|---|---|---|---|---|
+| Starter | Small business | R499 | 25 | R25.00 each | 3 |
+| Growth | Medium business | R1,799 | 150 | R14.00 each | 10 |
+| Enterprise | Bulk | R5,999 | 750 | graduated bands | 25 |
+
+Enterprise bands, counted from the first *chargeable* envelope:
+
+| Chargeable | Total sent | Rate |
+|---|---|---|
+| 1–1,750 | 751–2,500 | R8.50 |
+| 1,751–9,250 | 2,501–10,000 | R5.50 |
+| 9,251+ | 10,001+ | R3.50 |
+
+Also priced in GBP, EUR and USD. **Regional prices are set to what each
+market bears — they are not conversions.** R499 is not £29 at any exchange
+rate, and should not be.
+
+### Why the ladder is shaped like that
+
+Each tier's overage sits just above that tier's own effective included rate:
+
+```
+Starter      R499 /  25 = R20.00 included, R25.00 overage
+Growth     R1,799 / 150 = R11.99 included, R14.00 overage
+Enterprise R5,999 / 750 =  R8.00 included,  R8.50 first band
+```
+
+Going over is never punitive, but it is always slightly dearer than moving
+up. The overage nudges an upgrade instead of breeding resentment, and a
+customer who is consistently over is being told so by their own invoice.
+There is an assertion in the test suite that this property holds, so a future
+price change cannot quietly break it.
+
+### Changing a price
+
+`UPDATE plan_prices SET base_monthly = ... WHERE ...`. Prices are rows, not
+code. Nothing here is compiled into the application, and the pricing page,
+the in-app estimate and the invoice all read the same rows.
+
+### How metering works
+
+- A **database trigger** on `envelopes` records usage the moment status goes
+  `draft → sent`. It is a trigger and not application code so that every
+  path — UI, automation, API, replayed webhook — meters identically and none
+  can forget.
+- `usage_events` is unique on `(org_id, event_type, source_id)`, so a retry,
+  a double-clicked button or a replayed webhook cannot bill twice.
+  Idempotency is a constraint, not a convention.
+- `period_start` is stamped at write time, so changing plan never
+  retroactively rewrites history. Invoices reproduce exactly.
+- The pricing arithmetic lives in Postgres (`price_volume_bands`,
+  `estimate_current_charges`, `can_send_envelope`), not in TypeScript, so an
+  in-app estimate and an invoice can never disagree.
+
+### What blocks a send, and what does not
+
+Running out of allowance does **not** stop anything — the account moves into
+overage and the app says so. Only two things block:
+
+- a **cancelled or paused** subscription
+- a **hard cap** the customer set themselves
+
+A past-due invoice does *not* block. Cutting a business off mid-hire over an
+expired card loses the account, not just the invoice.
+
+Bands are graduated, never volume-repriced: crossing a threshold prices only
+the new envelopes, so a bill can never jump backwards and a customer one
+envelope over a line never gets a shock.
+
+---
+
 ## Region configuration
 
 One column on `organisations` — `region` — drives currency, the privacy regime
@@ -245,6 +341,9 @@ weekly digest.
 - Public applications, which create the candidate, the application and the
   consent record
 - Dashboard with stalling detection against each stage's own SLA
+- Pricing: three tiers in four currencies, graduated enterprise bands,
+  per-envelope metering, entitlement checks on send, in-app usage meter and
+  estimate, public pricing page with `Product`/`Offer` structured data
 
 **Scaffolded, needs the remaining screens**
 
@@ -255,7 +354,9 @@ weekly digest.
 - WhatsApp and email sending: schema, consent model and queue exist; the Meta
   Cloud API and SendGrid clients are not written
 - PDF flattening and the rendered certificate document
-- Billing
+- Payment gateway integration and invoice generation (the meter, pricing
+  engine and entitlement checks are done; PayFast/Peach/Stripe are not wired,
+  and nothing raises an invoice at period close yet)
 
 **Blocked on you**
 

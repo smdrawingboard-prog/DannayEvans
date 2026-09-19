@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { requireOrg } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { formatMoney } from '@/lib/region'
+import { getUsageEstimate } from '@/lib/billing'
 import { Panel, Pill, Stat, statusTone, EmptyState } from '@/components/ui'
 
 export async function generateMetadata({ params }: { params: Promise<{ org: string }> }) {
@@ -21,8 +22,9 @@ export default async function OverviewPage({
 
   // One round trip per tile rather than a single wide join: each of these is
   // a count, and counts do not benefit from being joined.
-  const [openRoles, inPipeline, awaitingSignature, placedThisMonth, pipelineValue, recentEnvelopes, stalling] =
+  const [estimate, openRoles, inPipeline, awaitingSignature, placedThisMonth, pipelineValue, recentEnvelopes, stalling] =
     await Promise.all([
+      getUsageEstimate(ctx.orgId),
       supabase.from('jobs').select('id', { count: 'exact', head: true })
         .eq('org_id', ctx.orgId).eq('status', 'open'),
       supabase.from('applications').select('id', { count: 'exact', head: true })
@@ -77,6 +79,19 @@ export default async function OverviewPage({
           value={formatMoney(totalPipeline, ctx.currency, ctx.region.locale)}
         />
       </div>
+
+      {/* Surfaced on the overview, not buried in settings: a customer should
+          never learn they are into overage from the invoice. */}
+      {estimate && estimate.included !== null && estimate.used >= estimate.included && (
+        <div role="status" className="panel border-state-warning p-4 text-sm">
+          You have used {estimate.used} of {estimate.included} envelopes included
+          this month. Further sends are charged at your overage rate — currently{' '}
+          {formatMoney(estimate.usageAmount, estimate.currency, ctx.region.locale)} this period.{' '}
+          <Link href={`/${slug}/settings/billing`} className="text-accent underline">
+            See your usage
+          </Link>
+        </div>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel
