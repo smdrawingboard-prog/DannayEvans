@@ -45,13 +45,26 @@ select assert(
 
 select assert(
   (select count(*) from document_templates
-    where org_id = :org and status = 'needs_legal_review') = 2,
-  'the two supplied documents are marked as needing review, not as ready');
+    where org_id = :org and status = 'needs_legal_review') = 5,
+  'the five supplied documents are marked as needing review, not as ready');
 
 select assert(
   (select count(*) from document_templates
-    where org_id = :org and status = 'needs_legal_drafting') = 5,
-  'the five undrafted agreements are marked as structure only');
+    where org_id = :org and status = 'needs_legal_drafting') = 2,
+  'the two still-undrafted agreements are marked as structure only');
+
+-- The ones that carry real supplied text must not still be skeletons.
+select assert(
+  (select count(*) from document_templates
+    where org_id = :org
+      and system_code in ('rtr','background_check_consent','nda')
+      and body_html like '%NOT YET DRAFTED%') = 0,
+  'the supplied agreements carry their text, not a placeholder');
+
+select assert(
+  (select count(*) from document_templates
+    where org_id = :org and system_code is null) = 0,
+  'every seeded template is linked back to the catalogue it came from');
 
 -- Nothing claims to be legally signed off, because nothing is.
 select assert(
@@ -59,10 +72,20 @@ select assert(
     where org_id = :org and status = 'ready') = 0,
   'no template claims to be legally approved');
 
+-- A status nobody reads is not a warning. Every undrafted agreement has to
+-- say so in the text itself, where whoever is about to send it will see it.
 select assert(
-  (select body_html like '%NOT YET DRAFTED%' from document_templates
-    where org_id = :org and category = 'nda'),
-  'an undrafted agreement says so in its own body, not just its status');
+  (select count(*) from document_templates
+    where org_id = :org and status = 'needs_legal_drafting'
+      and body_html not like '%NOT YET DRAFTED%') = 0,
+  'every undrafted agreement says so in its own body, not just its status');
+
+-- And the reverse: supplied text must not still carry the placeholder banner.
+select assert(
+  (select count(*) from document_templates
+    where org_id = :org and status <> 'needs_legal_drafting'
+      and body_html like '%NOT YET DRAFTED%') = 0,
+  'no supplied agreement still carries the undrafted banner');
 
 -- ---------------------------------------------------------------------------
 -- Every {{placeholder}} in a body is declared in merge_keys.
@@ -343,6 +366,74 @@ begin
     raise exception 'FAILED: a signed-in user can call the retention trigger directly';
   end if;
   raise notice 'passed: the retention trigger is not callable over the API';
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- The catalogue, and what happens when an agency edits its own copy
+-- ---------------------------------------------------------------------------
+select assert((select count(*) from system_document_templates) = 7,
+  'the catalogue holds the seven standard agreements');
+
+-- Editing the text takes the template out of our hands.
+update document_templates
+   set body_html = body_html || chr(10) || 'Our own extra clause.'
+ where org_id = :org and system_code = 'nda';
+
+select assert(
+  not (select is_system from document_templates
+        where org_id = :org and system_code = 'nda'),
+  'editing a template we shipped hands it to the agency');
+
+-- A later top-up leaves the edited one alone and still finds the rest.
+select assert(
+  (select body_html from document_templates
+    where org_id = :org and system_code = 'nda') like '%Our own extra clause.%',
+  'a top-up does not overwrite wording the agency wrote');
+
+do $$
+declare v_org uuid; v_before text;
+begin
+  select id into v_org from organisations where slug = 'test-recruitment';
+  select body_html into v_before from document_templates
+   where org_id = v_org and system_code = 'nda';
+  perform sync_document_pack(v_org);
+  if (select body_html from document_templates
+       where org_id = v_org and system_code = 'nda') is distinct from v_before then
+    raise exception 'FAILED: a top-up overwrote an edited template';
+  end if;
+  raise notice 'passed: syncing again leaves an edited template untouched';
+end $$;
+
+-- A template we still own does come forward.
+update system_document_templates
+   set body_html = body_html || chr(10) || 'Clause 9. Added upstream.',
+       version = version + 1
+ where code = 'dpa';
+
+do $$
+declare v_org uuid;
+begin
+  select id into v_org from organisations where slug = 'test-recruitment';
+  perform sync_document_pack(v_org);
+  if (select body_html from document_templates
+       where org_id = v_org and system_code = 'dpa') not like '%Added upstream.%' then
+    raise exception 'FAILED: an unedited template did not come forward';
+  end if;
+  raise notice 'passed: an unedited template is brought forward by a top-up';
+end $$;
+
+-- Syncing must never duplicate a workspace's templates.
+select assert((select count(*) from document_templates where org_id = :org) = 7,
+  'syncing twice does not duplicate the pack');
+
+-- The agency never seeds itself.
+do $$
+begin
+  if has_function_privilege('authenticated', 'sync_document_pack(uuid)', 'execute')
+     or has_function_privilege('anon', 'sync_document_pack(uuid)', 'execute') then
+    raise exception 'FAILED: a tenant can seed its own template pack';
+  end if;
+  raise notice 'passed: seeding the pack is not reachable from the API';
 end $$;
 
 rollback;
