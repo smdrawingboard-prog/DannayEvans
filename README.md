@@ -51,8 +51,9 @@ This spins the migrations up on a scratch Postgres and asserts the things that
 would be expensive to get wrong: that one tenant cannot read or write another
 tenant's rows, that an envelope only completes when the last signer signs,
 that audit events cannot be edited or deleted, and that every boundary of the
-graduated pricing bands prices correctly. Fifty-three assertions, all of which
-must pass before a release.
+graduated pricing bands prices correctly, and that a signed-in user cannot
+read another tenant's usage or billing through the SECURITY DEFINER billing
+functions. Fifty-seven assertions, all of which must pass before a release.
 
 Pricing maths is asserted at every band edge — the first unit of a band, the
 last unit, and the unit either side of each threshold — because band
@@ -330,7 +331,7 @@ weekly digest.
 
 **Working end to end**
 
-- Multi-tenant schema with RLS, verified by 19 assertions
+- Multi-tenant schema with RLS, verified by 57 assertions
 - Sign-up, workspace creation, membership and roles
 - The Sealed engine: create, send, sequential signing, decline, void, remind,
   audit trail, completion certificate
