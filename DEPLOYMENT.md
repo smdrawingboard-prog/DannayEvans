@@ -11,22 +11,29 @@ Both take a few minutes in a browser. Everything else is done.
 
 ## What is already live
 
-**Supabase project `hireframe-platform`**
+**Supabase project `DannayEvans`**
 
 | | |
 |---|---|
-| Project ref | `zejpartpcjkromdbtalb` |
-| Region | `eu-west-2` (London) |
-| API URL | `https://zejpartpcjkromdbtalb.supabase.co` |
-| Dashboard | https://supabase.com/dashboard/project/zejpartpcjkromdbtalb |
+| Project ref | `yxobtuhequmeflfnqpku` |
+| Region | `eu-west-1` (Ireland) |
+| API URL | `https://yxobtuhequmeflfnqpku.supabase.co` |
+| Dashboard | https://supabase.com/dashboard/project/yxobtuhequmeflfnqpku |
 
-London was chosen deliberately: South African traffic reaches Europe over
-cables that land in the UK, so it is the lowest-latency European region for
-both of the launch markets rather than a compromise between them.
+All ten migrations are applied and verified against a locally tested copy:
+45 tables, 50 policies, RLS enabled on all 45 with none missed, three
+pricing plans in four currencies, twelve volume bands, three storage
+buckets. Every graduated pricing band boundary returns the exact expected
+value on the live database, and `anon` can execute none of the
+application's functions.
 
-All ten migrations are applied and verified against a locally tested copy —
-45 tables, 50 policies, RLS enabled on every table, three pricing plans in
-four currencies, three storage buckets.
+> **A second project exists.** `hireframe-platform`
+> (`zejpartpcjkromdbtalb`, London) was created earlier in the build and
+> carries the identical schema. It is now redundant. Leaving two migrated
+> databases around is how the wrong one ends up in production, so delete it
+> at
+> https://supabase.com/dashboard/project/zejpartpcjkromdbtalb/settings/general
+> once you are happy this one is the keeper.
 
 ---
 
@@ -58,8 +65,8 @@ Development.
 ### Safe to paste anywhere
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://zejpartpcjkromdbtalb.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_Ili194H7pRVVJFTtxFMvIw__tYNHmW3
+NEXT_PUBLIC_SUPABASE_URL=https://yxobtuhequmeflfnqpku.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_hwDW17ZqC-XBntIBrh9_0Q_CVD4LkMk
 SIGNATURE_PROVIDER=sealed
 ```
 
@@ -75,7 +82,7 @@ SUPABASE_SERVICE_ROLE_KEY=<paste it>
 ```
 
 Get it from
-https://supabase.com/dashboard/project/zejpartpcjkromdbtalb/settings/api-keys
+https://supabase.com/dashboard/project/yxobtuhequmeflfnqpku/settings/api-keys
 under **service_role**.
 
 **This key bypasses every row-level security policy.** It must be set as a
