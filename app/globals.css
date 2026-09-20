@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Neutral executive palette from the Fate Collab recruitment design system.
+ * Borders, never drop shadows. Tokens are defined here as well as in the
+ * Tailwind config so plain CSS and inline styles stay in step.
+ */
+:root {
+  --bg-primary: #f8f7f4;
+  --bg-secondary: #efede8;
+  --bg-panel: #ffffff;
+  --line: #ddd9d1;
+  --ink: #1a1a18;
+  --ink-soft: #5c5850;
+  --ink-muted: #9a9590;
+  --accent: #2c3e50;
+  --accent-light: #ebf0f5;
+  --success: #3d7a5f;
+  --warning: #8c6d2f;
+  --danger: #8b3a3a;
+  --gold: #b8963e;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--bg-primary);
+    color: var(--ink);
+    font-family: var(--font-body), 'Gill Sans', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  /* Respect a reduced-motion preference rather than assuming everyone wants
+     transitions — and it keeps repaints down on low-end handsets. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-bg-panel border border-line rounded-panel;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm
+           border border-line rounded-panel bg-bg-panel text-ink
+           transition-colors hover:bg-bg-secondary
+           disabled:opacity-50 disabled:cursor-not-allowed;
+    min-height: 40px; /* comfortable touch target on mobile */
+  }
+  .btn-primary {
+    @apply bg-accent text-white border-accent hover:bg-ink;
+  }
+  .btn-danger {
+    @apply text-state-danger border-state-danger hover:bg-red-50;
+  }
+  .field {
+    @apply w-full px-3 py-2 text-sm bg-bg-panel border border-line rounded-panel
+           text-ink placeholder:text-ink-muted
+           focus:border-accent focus:outline-none;
+    min-height: 40px;
+  }
+  .label {
+    @apply block text-xs uppercase tracking-wider text-ink-soft mb-1.5;
+  }
+  .table-base {
+    @apply w-full text-sm border-collapse;
+  }
+  .table-base th {
+    @apply text-left text-xs uppercase tracking-wider text-ink-soft
+           font-normal py-2.5 px-3 border-b border-line whitespace-nowrap;
+  }
+  .table-base td {
+    @apply py-2.5 px-3 border-b border-line align-top;
+  }
+  .pill {
+    @apply inline-flex items-center px-2 py-0.5 text-xs border rounded-panel whitespace-nowrap;
+  }
+}
