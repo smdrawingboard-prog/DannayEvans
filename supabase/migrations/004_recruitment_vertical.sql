@@ -202,7 +202,6 @@ create table candidates (
 create index on candidates (org_id);
 create index on candidates (org_id, owner_id);
 create unique index on candidates (org_id, email) where email is not null and anonymised_at is null;
--- Full-text search across the fields recruiters actually search on.
 -- Full-text search over the fields recruiters actually search on.
 -- Wrapped in an IMMUTABLE function because an index expression may not call
 -- a merely STABLE one, and both to_tsvector(text, text) and array_to_string

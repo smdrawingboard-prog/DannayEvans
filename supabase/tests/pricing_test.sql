@@ -227,6 +227,61 @@ select assert(
   (select reason from can_send_envelope(:org)) = 'hard_cap_reached',
   'passing the hard cap stops further sends rather than running up the bill');
 
+-- ---------------------------------------------------------------------------
+-- Cross-tenant billing access (regression test for migration 010)
+--
+-- The billing functions are SECURITY DEFINER, so RLS does not protect them.
+-- Before 010 any signed-in user could read any organisation's usage and
+-- charges by passing its uuid. These assertions fail if that ever returns.
+-- ---------------------------------------------------------------------------
+insert into auth.users (id, email)
+values ('88888888-8888-8888-8888-888888888888', 'outsider@elsewhere.test');
+
+set local role authenticated;
+set local request.jwt.claim.sub = '88888888-8888-8888-8888-888888888888';
+
+do $$
+declare v_org uuid;
+begin
+  select id into v_org from organisations where slug = 'meter-test';
+  perform envelopes_used(v_org);
+  raise exception 'FAILED: an outsider read another tenant''s usage';
+exception
+  when insufficient_privilege then
+    raise notice 'passed: an outsider cannot read another tenant''s usage';
+end $$;
+
+do $$
+declare v_org uuid;
+begin
+  select id into v_org from organisations where slug = 'meter-test';
+  perform * from estimate_current_charges(v_org);
+  raise exception 'FAILED: an outsider read another tenant''s charges';
+exception
+  when insufficient_privilege then
+    raise notice 'passed: an outsider cannot read another tenant''s charges';
+end $$;
+
+do $$
+declare v_org uuid;
+begin
+  select id into v_org from organisations where slug = 'meter-test';
+  perform * from can_send_envelope(v_org);
+  raise exception 'FAILED: an outsider read another tenant''s entitlement';
+exception
+  when insufficient_privilege then
+    raise notice 'passed: an outsider cannot read another tenant''s entitlement';
+end $$;
+
+-- A member of that workspace is of course still allowed.
+set local request.jwt.claim.sub = '99999999-9999-9999-9999-999999999999';
+select assert(
+  (select used from can_send_envelope(
+     (select id from organisations where slug = 'meter-test'))) >= 0,
+  'a member can still read their own entitlement');
+
+reset role;
+
 rollback;
 
 \echo ''
