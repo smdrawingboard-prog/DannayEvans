@@ -49,8 +49,13 @@ select assert(
   'a new workspace gets the default candidate and deal pipelines');
 select assert(
   (select count(*) from automations
-    where org_id = (select id from organisations where slug = 'alpha')) = 7,
+    where org_id = (select id from organisations where slug = 'alpha')) = 8,
   'a new workspace gets the starter automations');
+select assert(
+  (select count(*) from automations
+    where org_id = (select id from organisations where slug = 'alpha')
+      and trigger_key = 'placement.created') = 1,
+  'including the one that runs the 90-day onboarding schedule');
 select assert(
   (select count(*) from careers_sites
     where org_id = (select id from organisations where slug = 'alpha')) = 1,
