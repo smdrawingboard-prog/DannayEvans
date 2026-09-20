@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { tryAdminClient } from '@/lib/supabase/admin'
 import { consentCopy, formatMoney, regionOf } from '@/lib/region'
 import { siteUrl } from '@/lib/brand'
 import { ApplyForm } from './apply-form'
@@ -9,7 +9,8 @@ import { ApplyForm } from './apply-form'
 export const revalidate = 300
 
 async function loadJob(orgSlug: string, jobSlug: string) {
-  const db = createAdminClient()
+  const db = tryAdminClient()
+  if (!db) return null
 
   const { data: org } = await db
     .from('organisations')

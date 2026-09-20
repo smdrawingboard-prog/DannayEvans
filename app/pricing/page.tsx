@@ -91,10 +91,13 @@ export default async function PricingPage({
       maximumFractionDigits: 2,
     }).format(n)
 
+  // With no catalogue there are no offers to describe, so the Product node
+  // is dropped rather than emitted empty — invalid structured data is worse
+  // than none.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
-      {
+      ...(plans.length === 0 ? [] : [{
         '@type': 'Product',
         name: `${BRAND.platform} — ${BRAND.engine} signature platform`,
         description:
@@ -117,7 +120,7 @@ export default async function PricingPage({
               unitText: 'MONTH',
             },
           })),
-      },
+      }]),
       {
         '@type': 'FAQPage',
         mainEntity: FAQ.map((f) => ({
@@ -168,6 +171,21 @@ export default async function PricingPage({
             </Link>
           ))}
         </nav>
+
+        {plans.length === 0 && (
+          <div className="panel p-6 mt-8">
+            <h2 className="text-xl">Pricing is not loading right now</h2>
+            <p className="mt-2 text-sm text-ink-soft max-w-prose">
+              Rather than show you numbers we cannot verify, here is the shape
+              of it: a monthly fee with signature envelopes included, then a
+              clear per-envelope rate above that, and bulk rates at volume.
+              Email us and we will send the current price list for your market.
+            </p>
+            <a href={`mailto:${BRAND.supportEmail}?subject=Pricing`} className="btn btn-primary mt-4">
+              Ask for pricing
+            </a>
+          </div>
+        )}
 
         <div className="mt-8 grid gap-4 lg:grid-cols-3 items-start">
           {plans.map((plan) => (

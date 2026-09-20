@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { siteUrl } from '@/lib/brand'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { tryAdminClient } from '@/lib/supabase/admin'
 
 export const revalidate = 3600
 
@@ -18,7 +18,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   try {
-    const db = createAdminClient()
+    const db = tryAdminClient()
+    if (!db) return base
     const { data: jobs } = await db
       .from('jobs')
       .select('slug, updated_at, organisations!inner(slug), careers_sites:org_id(enabled)')

@@ -19,3 +19,19 @@ export function createAdminClient() {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 }
+
+/**
+ * Same client, but returns null instead of throwing when the service role
+ * key is absent or malformed.
+ *
+ * Public pages use this. A missing key is a deployment mistake, and the
+ * right response to it on a page a stranger can reach is "not found" or a
+ * degraded view — never a 500 with a stack trace.
+ */
+export function tryAdminClient(): ReturnType<typeof createAdminClient> | null {
+  try {
+    return createAdminClient()
+  } catch {
+    return null
+  }
+}

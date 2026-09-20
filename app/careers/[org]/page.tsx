@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { tryAdminClient } from '@/lib/supabase/admin'
 import { formatMoney, regionOf } from '@/lib/region'
 import { siteUrl } from '@/lib/brand'
 
@@ -18,7 +18,11 @@ import { siteUrl } from '@/lib/brand'
 export const revalidate = 300
 
 async function loadSite(slug: string) {
-  const db = createAdminClient()
+  // Null rather than a throw: an unreachable backend on a public page
+  // should read as "not found", not as a server error.
+  const db = tryAdminClient()
+  if (!db) return null
+
   const { data: org } = await db
     .from('organisations')
     .select('id, name, slug, region, currency, logo_url, website_url, whatsapp_number')

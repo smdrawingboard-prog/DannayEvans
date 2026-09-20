@@ -70,7 +70,15 @@ export interface Entitlement {
  * filtered to plans explicitly marked public.
  */
 export async function getPlans(currency: string): Promise<Plan[]> {
-  const db = createAdminClient()
+  // The pricing page is a marketing page. If the catalogue cannot be read —
+  // a missing service role key, Supabase unreachable — it must degrade to a
+  // "talk to us" state, not return a 500 to someone deciding whether to buy.
+  let db: ReturnType<typeof createAdminClient>
+  try {
+    db = createAdminClient()
+  } catch {
+    return []
+  }
 
   const { data } = await db
     .from('pricing_plans')

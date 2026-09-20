@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient, tryAdminClient } from '@/lib/supabase/admin'
 import { SealedProvider } from './sealed-provider'
 import { safeEqual, sha256 } from './crypto'
 import { SignatureError } from './types'
@@ -64,7 +64,12 @@ export interface CeremonyContext {
 export async function resolveSigningToken(
   token: string,
 ): Promise<CeremonyContext | null> {
-  const db = createAdminClient()
+  // A signer is a stranger holding a link. If the backend is unreachable
+  // they see "this link is no longer valid", which is the same page an
+  // expired or revoked token gets — never a stack trace.
+  const db = tryAdminClient()
+  if (!db) return null
+
   const hash = sha256(token)
 
   const { data: recipient } = await db

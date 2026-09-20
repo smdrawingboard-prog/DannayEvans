@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { tryAdminClient } from '@/lib/supabase/admin'
 import { regionOf } from '@/lib/region'
 
 const schema = z.object({
@@ -41,7 +41,8 @@ export async function apply(_prev: ApplyState, form: FormData): Promise<ApplySta
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
   const input = parsed.data
-  const db = createAdminClient()
+  const db = tryAdminClient()
+  if (!db) return { error: 'We could not record your application. Please try again shortly.' }
 
   const { data: job } = await db
     .from('jobs')
