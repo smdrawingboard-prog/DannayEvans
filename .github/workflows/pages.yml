@@ -1,0 +1,42 @@
+# Publishes the static showcase in showcase/ to GitHub Pages.
+#
+# Replaces the sample Jekyll workflow, which would have tried to Jekyll-build
+# the whole repository — README, migrations, node_modules and all — and
+# produced nonsense. Pages serves static files only, so it cannot host the
+# application itself; that needs the server deploy in DEPLOYMENT.md.
+name: Deploy showcase to GitHub Pages
+
+on:
+  push:
+    branches:
+      - claude/build-crm-dashboard-ABPUV
+      - feat/recruitment-saas-platform
+    paths:
+      - 'showcase/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it part-way.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: showcase
+      - id: deployment
+        uses: actions/deploy-pages@v4

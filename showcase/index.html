@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hireframe — recruitment software with signatures built in</title>
+<meta name="description" content="A static preview of Hireframe: recruitment software for small and medium businesses, built on the Sealed document and signature engine. Real pricing, real design system, honest build status.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  /* The product's own design system: warm off-white, borders not shadows,
+     Playfair for headings, Lato for body. Same tokens as app/globals.css. */
+  :root{
+    --bg:#F8F7F4; --bg2:#EFEDE8; --panel:#fff; --line:#DDD9D1;
+    --ink:#1A1A18; --soft:#5C5850; --muted:#9A9590;
+    --accent:#2C3E50; --accent-l:#EBF0F5;
+    --ok:#3D7A5F; --warn:#8C6D2F; --danger:#8B3A3A;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Lato',system-ui,sans-serif;font-size:16px;line-height:1.65;
+    -webkit-text-size-adjust:100%}
+  h1,h2,h3{font-family:'Playfair Display',Georgia,serif;font-weight:600;
+    letter-spacing:-.01em;line-height:1.2;margin:0}
+  a{color:var(--accent)}
+  .wrap{max-width:60rem;margin:0 auto;padding:0 1rem}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:2px}
+  header{border-bottom:1px solid var(--line);background:var(--panel)}
+  .bar{display:flex;align-items:center;justify-content:space-between;
+    height:4rem;gap:1rem;flex-wrap:wrap}
+  .brand{font-family:'Playfair Display',serif;font-size:1.15rem}
+  .pill{display:inline-flex;align-items:center;padding:.15rem .5rem;font-size:.75rem;
+    border:1px solid var(--line);border-radius:2px;white-space:nowrap}
+  .pill-ok{border-color:var(--ok);color:var(--ok);background:#f1f7f4}
+  .pill-warn{border-color:var(--warn);color:var(--warn);background:#fbf7ef}
+  .pill-accent{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+  .notice{border-left:3px solid var(--warn);background:var(--panel);
+    border-top:1px solid var(--line);border-right:1px solid var(--line);
+    border-bottom:1px solid var(--line);padding:1rem 1.25rem;margin:1.5rem 0}
+  section{padding:3rem 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:none}
+  .lede{font-size:1.15rem;color:var(--soft);max-width:44rem}
+  .grid{display:grid;gap:1rem}
+  @media(min-width:48rem){.g3{grid-template-columns:repeat(3,1fr)}}
+  table{width:100%;border-collapse:collapse;font-size:.95rem}
+  th{text-align:left;font-weight:400;font-size:.72rem;text-transform:uppercase;
+    letter-spacing:.08em;color:var(--soft);padding:.6rem .7rem;
+    border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:.6rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .scroll{overflow-x:auto}
+  .switch{display:flex;gap:.35rem;flex-wrap:wrap;margin:1.25rem 0}
+  .switch button{font:inherit;font-size:.8rem;padding:.3rem .7rem;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);border-radius:2px;color:var(--soft)}
+  .switch button[aria-pressed=true]{border-color:var(--accent);background:var(--accent-l);
+    color:var(--accent)}
+  .plan{padding:1.5rem}
+  .plan h3{font-size:1.25rem}
+  .price{font-family:'Playfair Display',serif;font-size:2rem;margin-top:.75rem}
+  .per{font-size:.85rem;color:var(--soft)}
+  .plan ul{list-style:none;padding:0;margin:1rem 0 0;font-size:.9rem;color:var(--soft)}
+  .plan li{padding:.2rem 0 .2rem 1rem;position:relative}
+  .plan li::before{content:'·';position:absolute;left:.25rem;color:var(--ok)}
+  dl.kv{margin:0;font-size:.95rem}
+  dl.kv div{display:flex;justify-content:space-between;gap:1rem;
+    padding:.45rem 0;border-bottom:1px solid var(--line)}
+  dl.kv dt{color:var(--soft)} dl.kv dd{margin:0;text-align:right}
+  code{font-family:'Courier New',monospace;font-size:.85em;
+    background:var(--bg2);padding:.1rem .3rem;border-radius:2px}
+  footer{border-top:1px solid var(--line);padding:2rem 0;font-size:.85rem;color:var(--muted)}
+  .flow{counter-reset:s}
+  .flow li{counter-increment:s;list-style:none;padding:1rem 0 1rem 2.75rem;
+    position:relative;border-bottom:1px solid var(--line)}
+  .flow li::before{content:counter(s);position:absolute;left:0;top:1rem;
+    width:1.75rem;height:1.75rem;border:1px solid var(--line);border-radius:2px;
+    display:grid;place-items:center;font-size:.8rem;color:var(--soft);
+    font-family:'Playfair Display',serif}
+  .flow li:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <span class="brand">Hireframe</span>
+    <span style="font-size:.8rem;color:var(--muted)">
+      a Fate Collab product, built on Sealed
+    </span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <h1 style="font-size:clamp(1.9rem,5vw,3rem);max-width:38rem">
+      Recruitment software for small businesses — with signatures built in
+    </h1>
+    <p class="lede" style="margin-top:1.25rem">
+      Advertise the role, track the applicants, and get the offer signed.
+      One system, one record, no attachments going back and forth.
+    </p>
+
+    <div class="notice">
+      <strong>This page is a static preview, not the running product.</strong>
+      <p style="margin:.5rem 0 0;color:var(--soft);font-size:.95rem">
+        GitHub Pages serves static files only. The platform is a Next.js app
+        whose sign-in, pipelines, careers sites and the whole signing
+        ceremony run on a server and read a live Postgres database — none of
+        that can execute here. What follows is the product's public face,
+        rendered with the real design system and the real prices read out of
+        the live database, plus an honest account of what is built and what
+        is not. The working application needs the deploy described in
+        <code>DEPLOYMENT.md</code>.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>One hire, start to signed</h2>
+    <ol class="flow" style="padding:0;margin:1.5rem 0 0">
+      <li>
+        <strong>Publish the role.</strong>
+        The careers page is generated from the job record and carries
+        schema.org JobPosting data, which is what Google Jobs and AI search
+        actually read. Publishing is refused if the role has no summary,
+        description or location — Google drops listings missing those, so a
+        role published without them would silently never rank.
+      </li>
+      <li>
+        <strong>Run the pipeline.</strong>
+        Stages are configurable per business, because an eight-person agency
+        and a 200-person employer do not share a hiring process. Cards turn
+        amber past each stage's own target.
+      </li>
+      <li>
+        <strong>Get it signed.</strong>
+        Move a candidate to Offer and the pack goes out. Sealed records who
+        viewed it, when, from which IP address, and how their identity was
+        established, then issues a completion certificate.
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Pricing</h2>
+    <p class="lede" style="margin-top:.75rem">
+      One envelope sent is one charge, however many people sign it. Charged
+      on sending, not on signing.
+    </p>
+
+    <div class="switch" role="group" aria-label="Currency">
+      <button data-cur="ZAR" aria-pressed="true">South Africa (R)</button>
+      <button data-cur="GBP" aria-pressed="false">United Kingdom (£)</button>
+      <button data-cur="EUR" aria-pressed="false">Europe (€)</button>
+      <button data-cur="USD" aria-pressed="false">Rest of world ($)</button>
+    </div>
+
+    <div class="grid g3" id="plans"></div>
+
+    <h3 style="margin-top:2.5rem;font-size:1.1rem">Enterprise bulk bands</h3>
+    <p style="color:var(--soft);font-size:.95rem;max-width:44rem">
+      Counted from the first chargeable envelope, after the 750 included.
+      Graduated, so crossing a threshold prices only the new envelopes — a
+      bill can never jump backwards.
+    </p>
+    <div class="panel scroll" style="margin-top:.75rem">
+      <table>
+        <thead><tr><th>Chargeable</th><th>Total sent</th><th>Rate each</th></tr></thead>
+        <tbody id="bands"></tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:2.5rem;font-size:1.1rem">Why the ladder is shaped like that</h3>
+    <p style="color:var(--soft);font-size:.95rem;max-width:44rem">
+      Each tier's overage sits just above that tier's own effective included
+      rate — R20.00 against R25.00, R11.99 against R14.00, R8.00 against
+      R8.50. Going over is never punitive, but it is always slightly dearer
+      than moving up, so the overage nudges an upgrade instead of breeding
+      resentment. A customer who is consistently over is being told so by
+      their own invoice. There is an assertion in the test suite that this
+      property holds, so a future price change cannot quietly break it.
+    </p>
+    <p style="color:var(--muted);font-size:.85rem;margin-top:1rem">
+      Regional prices are set to what each market bears. They are not
+      conversions: R499 is not £29 at any exchange rate, and should not be.
+      Excludes VAT and local sales tax.
+    </p>
+  </section>
+
+  <section>
+    <h2>What is built, and what is not</h2>
+    <div class="grid" style="margin-top:1.5rem;gap:1.5rem">
+      <div class="panel" style="padding:1.5rem">
+        <span class="pill pill-ok">Working end to end</span>
+        <ul style="margin:1rem 0 0;padding-left:1.1rem;color:var(--soft);font-size:.95rem">
+          <li>Multi-tenant schema with row-level security on all 45 tables</li>
+          <li>Sign-up, workspaces, memberships and roles</li>
+          <li>Sealed: create, send, sequential signing, decline, void, remind,
+              audit trail, completion certificate</li>
+          <li>The signing ceremony, with access codes, explicit consent capture
+              and IP evidence</li>
+          <li>Roles, candidates, pipeline board, business development, careers
+              site editor, automations and settings</li>
+          <li>Public careers sites and job pages with JobPosting structured data</li>
+          <li>Public applications, creating the candidate, application and
+              consent record</li>
+          <li>Per-envelope metering, entitlement checks and the in-app usage meter</li>
+        </ul>
+      </div>
+      <div class="panel" style="padding:1.5rem">
+        <span class="pill pill-warn">Not done yet</span>
+        <ul style="margin:1rem 0 0;padding-left:1.1rem;color:var(--soft);font-size:.95rem">
+          <li><strong>No payment gateway.</strong> The meter, pricing engine and
+              entitlement checks work; nothing charges a card and nothing raises
+              an invoice at period close.</li>
+          <li><strong>No sending.</strong> WhatsApp and email have schema, consent
+              records and a queue, but no provider client — so the seven default
+              automations are stored and toggleable but do not fire.</li>
+          <li><strong>Assistants are not wired.</strong> All eleven are registered
+              with their prompts and logging; the model call is not connected.</li>
+          <li><strong>PDF flattening.</strong> Signatures are captured, evidenced
+              and hashed, but not yet burned into the PDF itself.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it is put together</h2>
+    <div class="grid" style="margin-top:1.5rem;gap:1rem;grid-template-columns:1fr">
+      <div class="panel" style="padding:1.5rem">
+        <h3 style="font-size:1.05rem">Sealed is the product. Recruitment is the vertical.</h3>
+        <p style="color:var(--soft);font-size:.95rem;margin:.75rem 0 0">
+          The signature engine knows nothing about candidates. Everything the
+          recruitment side needs goes through one interface with nine methods,
+          so swapping the built-in engine for another signature application is
+          one new class and one registry line. Each envelope records the
+          provider that created it, so existing documents keep working after a
+          switch.
+        </p>
+      </div>
+      <div class="panel" style="padding:1.5rem">
+        <h3 style="font-size:1.05rem">Tenants are separated by the database, not the app</h3>
+        <p style="color:var(--soft);font-size:.95rem;margin:.75rem 0 0">
+          Every business table carries an organisation id, and access is granted
+          only through a membership row. Row-level security is on for all 45
+          tables, so the database refuses cross-tenant access even if the
+          application asks for it. Middleware is deliberately not the
+          authorisation boundary — one route the matcher misses would be one
+          unprotected route.
+        </p>
+      </div>
+      <div class="panel" style="padding:1.5rem">
+        <h3 style="font-size:1.05rem">Evidence is the point</h3>
+        <p style="color:var(--soft);font-size:.95rem;margin:.75rem 0 0">
+          ECTA 2002 s13 in South Africa, the Electronic Communications Act 2000
+          in the UK and eIDAS in the EU all turn on the same thing: who signed,
+          when, from where, and how their identity was established. The audit
+          trail is append-only, enforced by a trigger and by revoking the
+          privilege, so an attempt fails before the trigger even runs. The
+          completion certificate carries a SHA-256 over the ordered event log
+          plus every document hash.
+        </p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem;font-size:1.1rem">Verification</h3>
+    <div class="panel" style="padding:1.25rem 1.5rem;margin-top:.75rem">
+      <dl class="kv">
+        <div><dt>Database assertions passing</dt><dd class="num">57</dd></div>
+        <div><dt>Tables, all with row-level security</dt><dd class="num">45</dd></div>
+        <div><dt>Row-level security policies</dt><dd class="num">50</dd></div>
+        <div><dt>Functions callable by an anonymous visitor</dt><dd class="num">0</dd></div>
+        <div style="border-bottom:none"><dt>Real bugs the tests caught before release</dt><dd class="num">6</dd></div>
+      </dl>
+      <p style="color:var(--muted);font-size:.85rem;margin:1rem 0 0">
+        The suite covers cross-tenant read and write refusal, envelope
+        completion only on the last signature, audit immutability, metering
+        idempotency, and every graduated pricing band boundary — first unit,
+        last unit, and the unit either side of each threshold, because band
+        arithmetic is exactly the kind of code that is subtly wrong and
+        silently mis-bills for months.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p style="margin:0">
+      Hireframe — a Fate Collab product, built on Sealed.
+      <a href="https://github.com/smdrawingboard-prog/DannayEvans">Source</a> ·
+      <a href="https://github.com/smdrawingboard-prog/DannayEvans/blob/feat/recruitment-saas-platform/DEPLOYMENT.md">Deployment guide</a> ·
+      <a href="https://github.com/smdrawingboard-prog/DannayEvans/blob/feat/recruitment-saas-platform/README.md">Architecture</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+// Prices are read out of the live database at build time and written in here,
+// so this page cannot drift from what the product actually charges.
+const PLANS = [
+  {code:'starter', name:'Starter', tag:'For a small team that hires a few times a year.',
+   env:25, seats:3, bands:false,
+   f:["25 signature envelopes a month","3 users","Careers site with job structured data","Applicant tracking and pipelines","Full audit trail and completion certificates","Email support"],
+   p:{ZAR:{m:499,y:4990,o:25,s:149},GBP:{m:29,y:290,o:1.4,s:8},EUR:{m:32,y:320,o:1.6,s:9},USD:{m:35,y:350,o:1.75,s:10}}},
+  {code:'growth', name:'Growth', tag:'For a business hiring every month, across more than one role.',
+   env:150, seats:10, bands:false, featured:true,
+   f:["150 signature envelopes a month","10 users","Everything in Starter","WhatsApp and email sequences","Weighted scorecards and shortlist reports","Automations and weekly digests","Priority support"],
+   p:{ZAR:{m:1799,y:17990,o:14,s:119},GBP:{m:99,y:990,o:.8,s:7},EUR:{m:109,y:1090,o:.9,s:7.5},USD:{m:119,y:1190,o:.95,s:8}}},
+  {code:'enterprise', name:'Enterprise', tag:'High volume, bulk rates, and terms negotiated with you.',
+   env:750, seats:25, bands:true,
+   f:["750 signature envelopes a month, then bulk rates","25 users","Everything in Growth","Bulk volume pricing on every extra envelope","Custom signing workflows and templates","SSO and named account manager","Annual contract and invoicing"],
+   p:{ZAR:{m:5999,y:59990,o:null,s:89},GBP:{m:349,y:3490,o:null,s:5},EUR:{m:379,y:3790,o:null,s:5.5},USD:{m:399,y:3990,o:null,s:6}}}
+];
+const BANDS = {
+  ZAR:[[1,1750,8.5],[1751,9250,5.5],[9251,null,3.5]],
+  GBP:[[1,1750,0.48],[1751,9250,0.31],[9251,null,0.20]],
+  EUR:[[1,1750,0.54],[1751,9250,0.35],[9251,null,0.22]],
+  USD:[[1,1750,0.58],[1751,9250,0.37],[9251,null,0.24]]
+};
+const LOCALE = {ZAR:'en-ZA', GBP:'en-GB', EUR:'en-IE', USD:'en-US'};
+
+const money = (n, c, dp = 0) => new Intl.NumberFormat(LOCALE[c],
+  {style:'currency', currency:c, minimumFractionDigits:dp, maximumFractionDigits:dp}).format(n);
+const qty = n => n.toLocaleString('en-GB');
+
+function render(cur) {
+  document.getElementById('plans').innerHTML = PLANS.map(pl => {
+    const p = pl.p[cur];
+    return `<article class="panel plan"${pl.featured ? ' style="border-color:var(--accent)"' : ''}>
+      ${pl.featured ? '<span class="pill pill-accent" style="margin-bottom:.6rem">Most businesses start here</span>' : ''}
+      <h3>${pl.name}</h3>
+      <p style="color:var(--soft);font-size:.9rem;margin:.4rem 0 0;min-height:2.6rem">${pl.tag}</p>
+      <p class="price num">${money(p.m, cur)}<span class="per"> / month</span></p>
+      <p class="per">or ${money(p.y, cur)} a year — two months free</p>
+      <dl class="kv" style="margin-top:1rem;border-top:1px solid var(--line);padding-top:.5rem">
+        <div><dt>Envelopes included</dt><dd class="num">${qty(pl.env)} / month</dd></div>
+        <div><dt>Users included</dt><dd class="num">${pl.seats}</dd></div>
+        <div><dt>Extra user</dt><dd class="num">${money(p.s, cur, 2)} / month</dd></div>
+        <div style="border-bottom:none"><dt>Each extra envelope</dt>
+          <dd class="num">${pl.bands ? 'bulk bands' : money(p.o, cur, 2)}</dd></div>
+      </dl>
+      <ul>${pl.f.map(x => `<li>${x}</li>`).join('')}</ul>
+    </article>`;
+  }).join('');
+
+  document.getElementById('bands').innerHTML = BANDS[cur].map(([from, to, rate]) =>
+    `<tr>
+       <td class="num">${qty(from)}${to ? '–' + qty(to) : '+'}</td>
+       <td class="num" style="color:var(--soft)">${qty(from + 750)}${to ? '–' + qty(to + 750) : '+'}</td>
+       <td class="num">${money(rate, cur, 2)}</td>
+     </tr>`).join('');
+}
+
+document.querySelectorAll('.switch button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.switch button')
+      .forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    render(b.dataset.cur);
+  });
+});
+render('ZAR');
+</script>
+</body>
+</html>
