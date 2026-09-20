@@ -6,7 +6,7 @@ Two products in one repository.
 engine. It is provider-agnostic, keeps an append-only audit trail, and knows
 nothing about recruitment.
 
-**Hireframe** (migrations `004`–`005`, `app/[org]/`) is the recruitment
+**Hireframe** (migrations `004`–`005`, `011`–`013`, `app/[org]/`) is the recruitment
 vertical built on top of it — the first market we take Sealed to. Applicant
 tracking, pipelines, a public careers site, and offers that go out for
 signature without leaving the record.
@@ -36,6 +36,12 @@ supabase/migrations/004_recruitment_vertical.sql
 supabase/migrations/005_comms_automation_seo.sql
 supabase/migrations/006_storage.sql
 supabase/migrations/007_grants.sql
+supabase/migrations/008_billing.sql
+supabase/migrations/009_seed_pricing.sql
+supabase/migrations/010_function_hardening.sql
+supabase/migrations/011_document_pack.sql
+supabase/migrations/012_seed_document_pack.sql
+supabase/migrations/013_document_pack_hardening.sql
 ```
 
 `001` is the old single-tenant schema and now lives in `legacy-vite-crm/`.
@@ -53,7 +59,9 @@ tenant's rows, that an envelope only completes when the last signer signs,
 that audit events cannot be edited or deleted, and that every boundary of the
 graduated pricing bands prices correctly, and that a signed-in user cannot
 read another tenant's usage or billing through the SECURITY DEFINER billing
-functions. Fifty-seven assertions, all of which must pass before a release.
+functions, that a candidate cannot be submitted twice to the same client, and
+that no document-pack function is reachable without signing in. Ninety-three
+assertions, all of which must pass before a release.
 
 Pricing maths is asserted at every band edge — the first unit of a band, the
 last unit, and the unit either side of each threshold — because band
@@ -331,7 +339,7 @@ weekly digest.
 
 **Working end to end**
 
-- Multi-tenant schema with RLS, verified by 57 assertions
+- Multi-tenant schema with RLS, verified by 93 assertions
 - Sign-up, workspace creation, membership and roles
 - The Sealed engine: create, send, sequential signing, decline, void, remind,
   audit trail, completion certificate

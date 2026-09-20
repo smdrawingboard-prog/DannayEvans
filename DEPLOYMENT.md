@@ -24,8 +24,8 @@ London is the right call for this product: South African traffic reaches
 Europe over cables that land in the UK, so it is the lowest-latency European
 region for both launch markets rather than a compromise between them.
 
-All nine migrations (`002`–`010`) are applied and verified against a locally
-tested copy: 45 tables, 50 policies, RLS enabled on all 45 with none missed,
+All twelve migrations (`002`–`013`) are applied and verified against a locally
+tested copy: 47 tables, 52 policies, RLS enabled on all 47 with none missed,
 three pricing plans in four currencies, twelve volume bands, three storage
 buckets. Every graduated pricing band boundary returns its exact expected
 value on the live database, and `anon` can execute none of the
@@ -147,14 +147,21 @@ Deploy, then walk one hire end to end. This exercises the parts that matter:
 npm run db:test
 ```
 
-57 assertions against a scratch Postgres: cross-tenant read and write
+93 assertions against a scratch Postgres: cross-tenant read and write
 refusal, envelope completion only on the last signature, audit immutability,
-every graduated pricing band boundary, metering idempotency, and the
-cross-tenant billing regression from migration 010. Needs a local Postgres 16
+every graduated pricing band boundary, metering idempotency, the dual-
+submission guard, unsuccessful-candidate retention, and the cross-tenant
+regressions from migrations 010 and 013. Needs a local Postgres 16
 on `/tmp:5433`, or set `PGHOST` and `PGPORT`.
 
-Run it before every release. It is fast and it has already caught four real
-bugs that would have shipped.
+Run it before every release. It is fast and it has already caught several
+real bugs that would have shipped, including a wrong caller check inside a
+SECURITY DEFINER guard that let every tenant through.
+
+The suite runs against a local copy, so it cannot see the PostgREST layer.
+Run the Supabase security advisor against the live project after every
+migration as well — it is what caught migration 011 exposing three functions
+to `anon`, which migration 013 closes.
 
 ---
 
