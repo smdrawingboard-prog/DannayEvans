@@ -24,8 +24,8 @@ London is the right call for this product: South African traffic reaches
 Europe over cables that land in the UK, so it is the lowest-latency European
 region for both launch markets rather than a compromise between them.
 
-All thirteen migrations (`002`–`014`) are applied and verified against a locally
-tested copy: 47 tables, 52 policies, RLS enabled on all 47 with none missed,
+All fifteen migrations (`002`–`016`) are applied and verified against a locally
+tested copy: 50 tables, 55 policies, RLS enabled on all 50 with none missed,
 three pricing plans in four currencies, twelve volume bands, three storage
 buckets. Every graduated pricing band boundary returns its exact expected
 value on the live database, and `anon` can execute none of the
@@ -147,7 +147,7 @@ Deploy, then walk one hire end to end. This exercises the parts that matter:
 npm run db:test
 ```
 
-103 assertions against a scratch Postgres: cross-tenant read and write
+131 assertions against a scratch Postgres: cross-tenant read and write
 refusal, envelope completion only on the last signature, audit immutability,
 every graduated pricing band boundary, metering idempotency, the dual-
 submission guard, unsuccessful-candidate retention, and the cross-tenant
