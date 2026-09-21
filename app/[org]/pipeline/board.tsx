@@ -8,6 +8,7 @@ export interface Card {
   id: string
   stageId: string | null
   candidateId: string
+  score?: number | null
   candidateName: string
   currentTitle: string | null
   jobTitle: string
@@ -90,6 +91,15 @@ export function Board({
                           {card.daysInStage}d in stage
                           {stalling && ` · past ${card.sla}d target`}
                         </p>
+
+                        <Link
+                          href={`/${orgSlug}/assess/${card.id}`}
+                          className="inline-block mt-1 text-xs text-accent hover:underline"
+                        >
+                          {card.score !== null && card.score !== undefined
+                            ? `Scored ${card.score}%`
+                            : 'Score'}
+                        </Link>
 
                         <label className="sr-only" htmlFor={`move-${card.id}`}>
                           Move {card.candidateName} to another stage

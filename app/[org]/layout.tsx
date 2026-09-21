@@ -12,6 +12,7 @@ const NAV = [
   { href: '/right-to-represent', label: 'Right to represent' },
   { href: '/placements', label: 'Placements' },
   { href: '/templates', label: 'Agreements' },
+  { href: '/documents', label: 'Documents' },
   { href: '/envelopes', label: 'Signatures' },
   { href: '/deals', label: 'Business development' },
   { href: '/careers', label: 'Careers site' },

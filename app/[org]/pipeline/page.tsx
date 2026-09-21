@@ -35,7 +35,7 @@ export default async function PipelinePage({
 
   let query = supabase
     .from('applications')
-    .select('id, stage_id, stage_entered_at, candidates(id, full_name, current_title), jobs(id, title)')
+    .select('id, stage_id, stage_entered_at, score, candidates(id, full_name, current_title), jobs(id, title)')
     .eq('org_id', ctx.orgId)
     .limit(500)
 
@@ -55,6 +55,7 @@ export default async function PipelinePage({
       id: a.id,
       stageId: a.stage_id,
       candidateId: c?.id ?? '',
+      score: a.score,
       candidateName: c?.full_name ?? 'Unknown',
       currentTitle: c?.current_title ?? null,
       jobTitle: j?.title ?? '—',

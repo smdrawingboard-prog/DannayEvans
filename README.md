@@ -46,6 +46,8 @@ supabase/migrations/014_agreement_pack_as_data.sql
 supabase/migrations/015_assessment_scoring.sql
 supabase/migrations/016_scorecard_library.sql
 supabase/migrations/017_onboarding_90_days.sql
+supabase/migrations/018_outreach_compliance.sql
+supabase/migrations/019_document_rules.sql
 ```
 
 `001` is the old single-tenant schema and now lives in `legacy-vite-crm/`.
@@ -64,7 +66,7 @@ that audit events cannot be edited or deleted, and that every boundary of the
 graduated pricing bands prices correctly, and that a signed-in user cannot
 read another tenant's usage or billing through the SECURITY DEFINER billing
 functions, that a candidate cannot be submitted twice to the same client, and
-that no document-pack function is reachable without signing in. One hundred and fifty-eight
+that no document-pack function is reachable without signing in. One hundred and ninety-seven
 assertions, all of which must pass before a release.
 
 Pricing maths is asserted at every band edge — the first unit of a band, the
@@ -343,7 +345,7 @@ weekly digest.
 
 **Working end to end**
 
-- Multi-tenant schema with RLS, verified by 158 assertions
+- Multi-tenant schema with RLS, verified by 197 assertions
 - Sign-up, workspace creation, membership and roles
 - The Sealed engine: create, send, sequential signing, decline, void, remind,
   audit trail, completion certificate
