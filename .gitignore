@@ -25,3 +25,5 @@ yarn-error.log*
 out/
 next-env.d.ts
 *.tsbuildinfo
+dist/
+showcase/dist/

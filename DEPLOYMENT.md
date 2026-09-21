@@ -165,6 +165,31 @@ to `anon`, which migration 013 closes.
 
 ---
 
+## GitHub Pages
+
+`npm run showcase` builds the static site into `showcase/dist` and fails on a
+broken internal link. The workflow in `.github/workflows/pages.yml` does the
+same on every push that touches `showcase/`.
+
+Pages serves files, not a server, so it publishes the marketing site and a
+walkthrough of every screen — not the application. Ten files need a Node
+process to exist at all: the service-role database key (`lib/supabase/admin.ts`
+and everything reading it), every server action, and the signature webhook at
+`app/api/webhooks/signatures`. A static host cannot run any of them.
+
+Moving the application itself to a static host would mean rewriting it as a
+browser-side client against Supabase. That is technically possible — row level
+security still holds from the browser — but it would put the service-role key
+nowhere safe, and it would render every page in JavaScript, which is the
+opposite of what the careers pages and job structured data need. The careers
+site is the part that has to be indexable.
+
+To enable Pages: Settings → Pages → Source: GitHub Actions. The workflow reads
+the published base URL from that configuration, so canonical links and the
+sitemap follow a rename or a custom domain without a code change.
+
+---
+
 ## Known gaps
 
 - **No payment gateway.** The meter, pricing engine and entitlement checks

@@ -10,7 +10,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:types": "supabase gen types typescript --local > lib/db/database.types.ts",
-    "db:test": "bash supabase/tests/run.sh"
+    "db:test": "bash supabase/tests/run.sh",
+    "showcase": "node showcase/write.mjs showcase/dist && node showcase/check-links.mjs showcase/dist"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

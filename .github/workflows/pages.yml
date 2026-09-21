@@ -1,15 +1,15 @@
-# Publishes the static showcase in showcase/ to GitHub Pages.
+# Builds the static showcase and publishes it to GitHub Pages.
 #
-# Replaces the sample Jekyll workflow, which would have tried to Jekyll-build
-# the whole repository — README, migrations, node_modules and all — and
-# produced nonsense. Pages serves static files only, so it cannot host the
-# application itself; that needs the server deploy in DEPLOYMENT.md.
+# Pages serves files, not a server. The application itself uses server
+# components, server actions, a service-role database key and a signature
+# webhook, so it cannot run here — what this publishes is the marketing site
+# plus a walkthrough of every screen. The real deploy is in DEPLOYMENT.md.
 name: Deploy showcase to GitHub Pages
 
 on:
   push:
     branches:
-      - claude/build-crm-dashboard-ABPUV
+      - main
       - feat/recruitment-saas-platform
     paths:
       - 'showcase/**'
@@ -27,16 +27,39 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Must come before the build: it resolves the published base URL, which
+      # is what canonical links and the sitemap are written against. Hard-coding
+      # a repository name here would break the moment the repo is renamed or
+      # moved to a custom domain.
+      - uses: actions/configure-pages@v5
+        id: pages
+
+      - name: Build the showcase
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url }}
+        run: node showcase/write.mjs dist
+
+      - name: Check every internal link resolves
+        run: node showcase/check-links.mjs dist
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
   deploy:
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: showcase
       - id: deployment
         uses: actions/deploy-pages@v4
