@@ -18,6 +18,7 @@ const NAV = [
   { href: '/careers', label: 'Careers site' },
   { href: '/automations', label: 'Automations' },
   { href: '/settings/outreach', label: 'Outreach and consent' },
+  { href: '/settings/reporting', label: 'Reporting' },
   { href: '/settings/billing', label: 'Plan and usage' },
   { href: '/settings', label: 'Settings' },
 ]
